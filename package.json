@@ -1,0 +1,43 @@
+{
+  "name": "copy-and-watch",
+  "version": "0.0.1",
+  "description": "Synchronize files or folders locally, with a watch option",
+  "main": "index.js",
+  "bin": {
+    "copy-and-watch": "index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/zont/copy-and-watch"
+  },
+  "keywords": [
+    "rsync",
+    "copy",
+    "cp",
+    "cpw",
+    "copyw",
+    "catw",
+    "folder",
+    "directory",
+    "file",
+    "watch"
+  ],
+  "author": "Alexander Zonov",
+  "license": "MIT",
+  "dependencies": {
+    "chokidar": "^1.6.1",
+    "colors": "^1.1.2",
+    "fs-extra": "^2.0.0",
+    "glob": "^7.1.1",
+    "glob-parent": "^3.1.0"
+  },
+  "devDependencies": {
+    "eslint": "^3.15.0"
+  },
+  "scripts": {
+    "lint": "eslint index.js"
+  },
+  "engines": {
+    "node": ">=6.0.0"
+  }
+}
