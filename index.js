@@ -1,5 +1,3 @@
-#!/usr/bin/env node
-
 /* IMPORTS */
 
 const fs = require('fs-extra');
