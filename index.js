@@ -36,8 +36,14 @@ const findTarget = from => {
     .reverse()[0];
   return path.join(target, path.relative(parent, from));
 };
+const createDirIfNotExist = dir => {
+  if (!fs.existsSync(dir)) {
+    fs.mkdirSync(dir);
+  }
+};
 const copy = from => {
   const to = findTarget(from);
+  createDirIfNotExist(path.dirname(to));
   fs.writeFileSync(to, fs.readFileSync(from));
   console.log('[COPY]'.yellow, from, 'to'.yellow, to);
 };
@@ -46,16 +52,27 @@ const remove = from => {
   fs.unlinkSync(to);
   console.log('[DELETE]'.yellow, to);
 };
+const rimraf = dir => {
+  if (fs.existsSync(dir)) {
+    fs.readdirSync(dir).forEach(entry => {
+      const entryPath = path.join(dir, entry);
+      if (fs.lstatSync(entryPath).isDirectory()) {
+        rimraf(entryPath);
+      } else {
+        fs.unlinkSync(entryPath);
+      }
+    });
+    fs.rmdirSync(dir);
+  }
+};
 
 // clean
 if (options.clean) {
-  fs.rmdirSync(target)
+  rimraf(target);
 }
 
 // initial copy
-if (!fs.existsSync(target)) {
-  fs.mkdirSync(target);
-}
+createDirIfNotExist(target);
 sources.forEach(s => glob.sync(s).forEach(copy));
 
 // watch
