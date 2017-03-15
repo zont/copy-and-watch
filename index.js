@@ -2,7 +2,7 @@
 
 /* IMPORTS */
 
-const fs = require('fs-extra');
+const fs = require('fs');
 const path = require('path');
 const chokidar = require('chokidar');
 const glob = require('glob');
@@ -36,17 +36,19 @@ const findTarget = from => {
 };
 const copy = from => {
   const to = findTarget(from);
-  fs.copySync(from, to);
+  fs.writeFileSync(to, fs.readFileSync(from));
   console.log('[COPY]'.yellow, from, 'to'.yellow, to);
 };
 const remove = from => {
   const to = findTarget(from);
-  fs.remove(to);
+  fs.unlinkSync(to);
   console.log('[DELETE]'.yellow, to);
 };
 
 // initial copy
-fs.ensureDirSync(target);
+if (!fs.existsSync(target)) {
+  fs.mkdirSync(target);
+}
 sources.forEach(s => glob.sync(s).forEach(copy));
 
 // watch
