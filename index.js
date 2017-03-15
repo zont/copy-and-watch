@@ -72,7 +72,6 @@ if (options.clean) {
 }
 
 // initial copy
-createDirIfNotExist(target);
 sources.forEach(s => glob.sync(s).forEach(copy));
 
 // watch
