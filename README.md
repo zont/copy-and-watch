@@ -11,7 +11,11 @@ npm i -D copy-and-watch
 ## Usage
 
 ```sh
-copy-and-watch [--watch] <sources> <target>
+copy-and-watch [options] <sources> <target>
+
+options:
+  --watch - enable file watcher
+  --clean - clean target folder on start
 ```
 
 ### In your `package.json`

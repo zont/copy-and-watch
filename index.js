@@ -1,5 +1,3 @@
-#!/usr/bin/env node
-
 /* IMPORTS */
 
 const fs = require('fs');
@@ -12,14 +10,18 @@ require('colors');
 /* CODE */
 
 const args = process.argv.slice(2);
-const watch = args.includes('--watch');
+const options = {};
 
-if (watch) {
-  args.splice(args.indexOf('--watch'), 1);
-}
+['watch', 'clean'].forEach(key => {
+  const index = args.indexOf(`--${key}`);
+  if (index >= 0) {
+    options[key] = true;
+    args.splice(index, 1);
+  }
+});
 
 if (args.length < 2) {
-  console.error('Not enough arguments: copy-and-watch [--watch] <sources> <target>'.red);
+  console.error('Not enough arguments: copy-and-watch [options] <sources> <target>'.red);
   process.exit(1);
 }
 
@@ -29,7 +31,7 @@ const parents = [...new Set(sources.map(globParent))];
 
 const findTarget = from => {
   const parent = parents
-    .filter(p => from.includes(p))
+    .filter(p => from.indexOf(p) >= 0)
     .sort()
     .reverse()[0];
   return path.join(target, path.relative(parent, from));
@@ -45,6 +47,11 @@ const remove = from => {
   console.log('[DELETE]'.yellow, to);
 };
 
+// clean
+if (options.clean) {
+  fs.rmdirSync(target)
+}
+
 // initial copy
 if (!fs.existsSync(target)) {
   fs.mkdirSync(target);
@@ -52,7 +59,7 @@ if (!fs.existsSync(target)) {
 sources.forEach(s => glob.sync(s).forEach(copy));
 
 // watch
-if (watch) {
+if (options.watch) {
   chokidar.watch(sources, {
     ignoreInitial: true
   })
@@ -62,5 +69,5 @@ if (watch) {
     .on('change', copy)
     .on('unlink', remove)
     .on('unlinkDir', remove)
-    .on('error', e => console.log('error', e));
+    .on('error', e => console.log('[ERROR]'.red, e));
 }
