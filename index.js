@@ -36,14 +36,24 @@ const findTarget = from => {
     .reverse()[0];
   return path.join(target, path.relative(parent, from));
 };
-const createDirIfNotExist = dir => {
-  if (!fs.existsSync(dir)) {
-    fs.mkdirSync(dir);
+const createDirIfNotExist = to => {
+  const dirs = [];
+  let dir = path.dirname(to);
+
+  while (dir !== path.dirname(dir)) {
+    dirs.unshift(dir);
+    dir = path.dirname(dir);
   }
+
+  dirs.forEach(dir => {
+    if (!fs.existsSync(dir)) {
+      fs.mkdirSync(dir);
+    }
+  });
 };
 const copy = from => {
   const to = findTarget(from);
-  createDirIfNotExist(path.dirname(to));
+  createDirIfNotExist(to);
   fs.writeFileSync(to, fs.readFileSync(from));
   console.log('[COPY]'.yellow, from, 'to'.yellow, to);
 };
