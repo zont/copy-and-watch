@@ -37,6 +37,8 @@ const findTarget = from => {
   return path.join(target, path.relative(parent, from));
 };
 const createDirIfNotExist = to => {
+  'use strict';
+
   const dirs = [];
   let dir = path.dirname(to);
 
