@@ -33,3 +33,8 @@ You may have some build script in your package.json involving mirroring folders 
   }
 }
 ```
+
+## Changelog
+
+##### 0.1.2
+- Fixed copy on dir bug (by arnarthor)
