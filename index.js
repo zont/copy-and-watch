@@ -56,6 +56,10 @@ const createDirIfNotExist = to => {
 const copy = from => {
   const to = findTarget(from);
   createDirIfNotExist(to);
+  const stats = fs.statSync(from);
+  if (stats.isDirectory()) {
+    return;
+  }
   fs.writeFileSync(to, fs.readFileSync(from));
   console.log('[COPY]'.yellow, from, 'to'.yellow, to);
 };
