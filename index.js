@@ -23,7 +23,7 @@ for (let arg of args) {
 	} else if (arg === '--clean') {
 		clean = true;
 	} else {
-		sourceGlobs.push(arg);
+		sourceGlobs.push(path.normalize(arg));
 	}
 }
 
@@ -34,7 +34,7 @@ if (sourceGlobs.length === 0 || destination === undefined) {
 	process.exit(1);
 }
 
-parents = [...new Set(sourceGlobs.map(globParent))];
+parents = [...new Set(sourceGlobs.map(globParent).map(path.normalize))];
 
 if (clean) {
 	console.log('Cleaning...');
@@ -67,7 +67,7 @@ if (watch) {
 /* FUNCTIONS */
 function findTarget(from) {
 	const parent = parents
-		.filter(p => from.indexOf(p) >= 0)
+		.filter(parent => from.indexOf(parent) >= 0)
 		.sort()
 		.reverse()[0];
 	return path.join(destination, path.relative(parent, from));
@@ -92,16 +92,17 @@ function createDirIfNotExist(to) {
 }
 
 function copy(from) {
-	const to = findTarget(from);
+	const pathFrom = path.normalize(from);
+	const to = findTarget(pathFrom);
 	createDirIfNotExist(to);
 	
-	const stats = fs.statSync(from);
+	const stats = fs.statSync(pathFrom);
 	
 	if (stats.isDirectory()) {
-		fs.readdirSync(from).map(fileName => from+fileName).forEach(copy); //recursively copy directory contents
+		fs.readdirSync(pathFrom).map(fileName => path.join(pathFrom, fileName)).forEach(copy); //recursively copy directory contents
 	} else {
-		fs.writeFileSync(to, fs.readFileSync(from));
-		console.log('[COPY]'.yellow, from, 'to'.yellow, to);
+		fs.writeFileSync(to, fs.readFileSync(pathFrom));
+		console.log('[COPY]'.yellow, pathFrom, 'to'.yellow, to);
 	}
 }
 
