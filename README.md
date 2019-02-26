@@ -1,5 +1,10 @@
 # copy-and-watch
 
+[!['Build status'][travis_image_url]][travis_page_url]
+
+[travis_image_url]: https://api.travis-ci.org/zont/copy-and-watch.svg
+[travis_page_url]: https://travis-ci.org/zont/copy-and-watch
+
 Synchronize files and folders locally by glob patterns, watch option included.
 
 ## Install
