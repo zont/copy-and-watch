@@ -1,5 +1,4 @@
 /* IMPORTS */
-
 const fs = require('fs');
 const path = require('path');
 const chokidar = require('chokidar');
@@ -7,36 +6,21 @@ const glob = require('glob');
 const globParent = require('glob-parent');
 require('colors');
 
-/* CODE */
 
-const args = process.argv.slice(2);
-const options = {};
+/* EVIL GLOBALS */
+let destination, parents;
 
-['watch', 'clean'].forEach(key => {
-  const index = args.indexOf(`--${key}`);
-  if (index >= 0) {
-    options[key] = true;
-    args.splice(index, 1);
-  }
-});
 
-if (args.length < 2) {
-  console.error('Not enough arguments: copy-and-watch [options] <sources> <target>'.red);
-  process.exit(1);
-}
-
-const target = args.pop();
-const sources = args;
-const parents = [...new Set(sources.map(globParent))];
-
-const findTarget = from => {
+/* FUNCTIONS */
+function findTarget(from) {
   const parent = parents
-    .filter(p => from.indexOf(p) >= 0)
+    .filter(parent => from.indexOf(parent) >= 0)
     .sort()
     .reverse()[0];
-  return path.join(target, path.relative(parent, from));
-};
-const createDirIfNotExist = to => {
+  return path.join(destination, path.relative(parent, from));
+}
+
+function createDirIfNotExist(to) {
   'use strict';
 
   const dirs = [];
@@ -52,50 +36,84 @@ const createDirIfNotExist = to => {
       fs.mkdirSync(dir);
     }
   });
-};
-const copy = from => {
-  const to = findTarget(from);
+}
+
+function copy(from) {
+  const pathFrom = path.normalize(from);
+  const to = findTarget(pathFrom);
   createDirIfNotExist(to);
-  const stats = fs.statSync(from);
+
+  const stats = fs.statSync(pathFrom);
+
   if (stats.isDirectory()) {
-    return;
+    fs.readdirSync(pathFrom).map(fileName => path.join(pathFrom, fileName))
+	  .forEach(copy); // recursively copy directory contents
+  } else {
+    fs.writeFileSync(to, fs.readFileSync(pathFrom));
+    console.log('[COPY]'.yellow, pathFrom, 'to'.yellow, to);
   }
-  fs.writeFileSync(to, fs.readFileSync(from));
-  console.log('[COPY]'.yellow, from, 'to'.yellow, to);
-};
-const remove = from => {
+}
+
+function remove(from) {
   const to = findTarget(from);
   fs.unlinkSync(to);
-  console.log('[DELETE]'.yellow, to);
-};
-const rimraf = dir => {
+  console.log('[DELETE]'.red, to);
+}
+
+function rimraf(dir) {
   if (fs.existsSync(dir)) {
     fs.readdirSync(dir).forEach(entry => {
       const entryPath = path.join(dir, entry);
       if (fs.lstatSync(entryPath).isDirectory()) {
         rimraf(entryPath);
       } else {
+        console.log('[CLEAN]'.magenta, entryPath);
         fs.unlinkSync(entryPath);
       }
     });
     fs.rmdirSync(dir);
   }
-};
+}
 
-// clean
-if (options.clean) {
-  rimraf(target);
+
+/* CODE */
+const args = process.argv.slice(2);
+
+let watch = false, clean = false;
+const sourceGlobs = [];
+
+for (const arg of args) {
+  if (arg === '--watch') {
+    watch = true;
+  } else if (arg === '--clean') {
+    clean = true;
+  } else {
+    sourceGlobs.push(path.normalize(arg));
+  }
+}
+
+if (sourceGlobs.length < 2) {
+  console.error('Not enough arguments: copy-and-watch [options] <sources> <target>'.red);
+  process.exit(1);
+}
+
+destination = sourceGlobs.pop(); // pick last path as destination
+parents = [...new Set(sourceGlobs.map(globParent).map(path.normalize))];
+
+if (clean) {
+  console.log('Cleaning...');
+  rimraf(destination);
 }
 
 // initial copy
-sources.forEach(s => glob.sync(s).forEach(copy));
+sourceGlobs.forEach(s => glob.sync(s).forEach(copy));
 
 // watch
-if (options.watch) {
-  chokidar.watch(sources, {
+if (watch) {
+  chokidar.watch(sourceGlobs, {
     ignoreInitial: true
   })
-    .on('ready', () => sources.forEach(s => console.log('[WATCH]'.yellow, s)))
+    .on('ready', () => sourceGlobs.forEach(s => console.log('[WATCHING]'.cyan, s)))
     .on('add', copy)
     .on('addDir', copy)
     .on('change', copy)
