@@ -1,6 +1,6 @@
 {
   "name": "copy-and-watch",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "description": "Synchronize files or folders locally, with a watch option",
   "main": "index.js",
   "bin": {
@@ -25,18 +25,18 @@
   "author": "Alexander Zonov",
   "license": "MIT",
   "dependencies": {
-    "chokidar": "^1.6.1",
-    "colors": "^1.1.2",
-    "glob": "^7.1.1",
-    "glob-parent": "^3.1.0"
+    "chokidar": "3.0.2",
+    "colors": "1.3.3",
+    "glob": "7.1.4",
+    "glob-parent": "5.0.0"
   },
   "devDependencies": {
-    "eslint": "^3.15.0"
+    "eslint": "^6.0.1"
   },
   "scripts": {
-    "lint": "eslint index.js"
+    "lint": "eslint --fix index.js"
   },
   "engines": {
-    "node": ">=6.0.0"
+    "node": ">=6"
   }
 }
