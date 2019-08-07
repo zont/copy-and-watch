@@ -10,7 +10,7 @@ require('colors');
 const args = process.argv.slice(2);
 const options = {};
 
-['watch', 'clean'].forEach(key => {
+['watch', 'clean', 'skip-initial-copy'].forEach(key => {
   const index = args.indexOf(`--${key}`);
   if (index >= 0) {
     options[key] = true;
@@ -20,6 +20,11 @@ const options = {};
 
 if (args.length < 2) {
   console.error('Not enough arguments: copy-and-watch [options] <sources> <target>'.red);
+  process.exit(1);
+}
+
+if (options['skip-initial-copy'] && !options['watch']) {
+  console.error('--skip-initial-copy argument is meant to be used with --watch, otherwise no files will be copied'.red);
   process.exit(1);
 }
 
@@ -86,13 +91,16 @@ if (options.clean) {
 }
 
 // initial copy
-sources.forEach(s => glob.sync(s).forEach(copy));
+if (!options['skip-initial-copy']) {
+  sources.forEach(s => glob.sync(s).forEach(copy));
+}
 
 // watch
 if (options.watch) {
-  chokidar.watch(sources, {
-    ignoreInitial: true
-  })
+  chokidar
+    .watch(sources, {
+      ignoreInitial: true
+    })
     .on('ready', () => sources.forEach(s => console.log('[WATCH]'.yellow, s)))
     .on('add', copy)
     .on('addDir', copy)
