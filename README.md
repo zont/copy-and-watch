@@ -21,6 +21,7 @@ copy-and-watch [options] <sources> <target>
 options:
   --watch - enable file watcher
   --clean - clean target folder on start
+  --skip-initial-copy - skip copying files initially, only copy if they change. Must be used with `--watch` argument.
 ```
 
 ### In your `package.json`
@@ -42,4 +43,5 @@ You may have some build script in your package.json involving mirroring folders 
 ## Changelog
 
 ##### 0.1.2
+
 - Fixed copy on dir bug (by arnarthor)
