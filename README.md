@@ -42,6 +42,8 @@ You may have some build script in your package.json involving mirroring folders 
 
 ## Changelog
 
-##### 0.1.2
+##### 0.1.4
+- Added support for `—skip-initial-copy` argument (by mugli)
 
+##### 0.1.2
 - Fixed copy on dir bug (by arnarthor)
