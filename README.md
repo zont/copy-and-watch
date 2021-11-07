@@ -34,8 +34,8 @@ You may have some build script in your package.json involving mirroring folders 
     "copy-and-watch": "latest"
   },
   "scripts": {
-    "build": "copy-and-watch src/**/*.{html,json} src/**/fonts/* dist",
-    "watch": "copy-and-watch --watch src/**/*.{html,json} src/**/{fonts,images}/* dist"
+    "build": "copy-and-watch src/**/*.{html,json} src/**/fonts/* dist/",
+    "watch": "copy-and-watch --watch src/**/*.{html,json} src/**/{fonts,images}/* dist/"
   }
 }
 ```
