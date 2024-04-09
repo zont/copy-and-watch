@@ -42,6 +42,9 @@ You may have some build script in your package.json involving mirroring folders 
 
 ## Changelog
 
+##### 0.1.7
+- Check file existence before removal (by mt3o)
+
 ##### 0.1.4
 - Added support for `—skip-initial-copy` argument (by mugli)
 
