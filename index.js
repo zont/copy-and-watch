@@ -68,8 +68,12 @@ const copy = from => {
 };
 const remove = from => {
   const to = findTarget(from);
-  fs.unlinkSync(to);
-  console.log('[DELETE]'.yellow, to);
+  if(fs.existsSync(to)) {
+    fs.unlinkSync(to);
+    console.log('[DELETE]'.yellow, to);
+  }else{
+    console.log('[DELETE FAILED]'.yellow, to);
+  }  
 };
 const rimraf = dir => {
   if (fs.existsSync(dir)) {
